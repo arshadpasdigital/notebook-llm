@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { globalErrorHandler, notFoundHandler } from './utils/ErrorHandle';
+import { createRAGRouter } from './routers/rag.router';
+import { JobService } from './services/JobService';
 
 export const createApp = (): Application => {
   const app = express();
@@ -33,6 +35,13 @@ export const createApp = (): Application => {
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
+
+  // Initialize services and routes
+  const jobService = new JobService();
+  const ragRouter = createRAGRouter(jobService);
+
+  // Mount RAG router
+  app.use('/api/rag', ragRouter);
 
   // Not found handler
   app.use(notFoundHandler);

@@ -1,10 +1,54 @@
-/**
- * @goal : to create the user route to handle all user related routes 
- * @description : it has mainly three routes 
- *  1. /indexing POST => is used to create the indexing create in job
- *  2. /:JobId GET  => get the status of job
- *  3. /query POSt => asking the query
- * 
- * @purpose : it is here we follow the solid principle and add the DI
- * 
- * / 
+import mongoose, { Schema, type Document } from 'mongoose';
+
+export type JobStatus = 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
+
+export interface IJob extends Document {
+  jobId: string;
+  status: JobStatus;
+  type: 'indexing' | "indexing-youtube" | "indexing-website" | 'query';
+  data: Record<string, unknown>;
+  result?: Record<string, unknown>;
+  error?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+}
+
+const JobSchema = new Schema<IJob>(
+  {
+    jobId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: ['waiting', 'active', 'completed', 'failed', 'delayed'],
+      default: 'waiting',
+    },
+    type: {
+      type: String,
+      enum: ['indexing', "indexing-youtube", "indexing-website", 'query'],
+      required: true,
+    },
+    data: {
+      type: Schema.Types.Mixed,
+      required: true,
+    },
+    result: {
+      type: Schema.Types.Mixed,
+    },
+    error: {
+      type: String,
+    },
+    completedAt: {
+      type: Date,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const Job = mongoose.model<IJob>('Job', JobSchema);

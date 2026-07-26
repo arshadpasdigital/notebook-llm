@@ -1,18 +1,16 @@
-version: "3.8"
-
 services:
   qdrant:
     image: qdrant/qdrant:v1.18.3
     container_name: qdrant-prod
     restart: unless-stopped
     ports:
-      - "6333:6333"   # REST API
+      - "${QDRANT_HTTP_PORT:-6333}:6333" # REST API
     volumes:
       - qdrant_data:/qdrant/storage
       - ./config:/qdrant/config
     environment:
-      - QDRANT__SERVICE__API_KEY=your-secret-key-here
-      - QDRANT__LOG_LEVEL=INFO
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY:-1bfb80a5-7ca3-4ee5-bb0e-dcd65186ba2d}
+      - QDRANT__LOG_LEVEL=${QDRANT_LOG_LEVEL:-INFO}
       - QDRANT__SERVICE__HTTP_PORT=6333
       - QDRANT__SERVICE__GRPC_PORT=6334
     deploy:
@@ -36,19 +34,32 @@ services:
     image: redis:7-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass your_strong_password
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-your_strong_password}
     restart: unless-stopped
 
+  bull-board:
+    image: venatum/bull-board:latest
+    container_name: bullmq-dashboard
+    ports:
+      - "${BULL_BOARD_PORT:-4000}:3000"
+    environment:
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - bullmq-network
 
 networks:
   qdrant_net:
-    driver: bridge   
+  bullmq-network:
+    driver: bridge
 
 volumes:
   qdrant_data:
     driver: local
-  reids_data:
+  redis_data:
     driver: local
