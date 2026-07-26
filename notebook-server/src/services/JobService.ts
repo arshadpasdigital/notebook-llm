@@ -23,6 +23,7 @@ export class JobService implements IJobService {
 
   async createJob(input: CreateJobInput): Promise<IJob> {
     try {
+      this._setQueue(input.type)
       const bullJob = await this.queue.add(input.type, input.data);
 
       const job = await Job.create({
@@ -81,6 +82,10 @@ export class JobService implements IJobService {
         password: process.env.REDIS_PASSWORD,
       },
     });
+  }
+
+  _setQueue(queueType: string) {
+    this.queue = new Queue(queueType, { connection })
   }
 
   async close(): Promise<void> {

@@ -8,10 +8,12 @@ const getChunks = async (text: string) => {
         chunkOverlap: 200,
     })
     const allSplits = await textSplitter.splitText(text);
+    console.log("=== get the chunks ===")
+    console.log(allSplits)
     return allSplits;
 }
 
-export const textIndexOf = async ({ source, text }: { source: string, text: string }) => {
+export const textIndexOf = async (text: string) => {
     await initCollection();
     const chunks = await getChunks(text);
     await embeddingAndIndexText(chunks);

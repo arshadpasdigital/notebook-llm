@@ -7,19 +7,16 @@ export class RAGController {
 
   createIndexingJob = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { source, options } = req.body;
-      const file = req.file;
-      if (!file) {
-        throw new ValidationError('file is required');
-      }
+      const { text } = req.body;
+      console.log(text)
 
-      if (!source) {
-        throw new ValidationError('Source is required');
+      if (!text) {
+        throw new ValidationError('text is required');
       }
 
       const job = await this.jobService.createJob({
         type: 'indexing',
-        data: { source, options },
+        data: { text },
       });
 
       res.status(201).json({
@@ -27,6 +24,14 @@ export class RAGController {
         data: {
           jobId: job.jobId,
           status: job.status,
+        },
+      });
+      res.status(201).json({
+        status: 'success',
+        data: {
+          jobId: 1,
+          status: 'success',
+          message: text
         },
       });
     } catch (error) {
@@ -81,6 +86,41 @@ export class RAGController {
         },
       });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  createIndexingJobForText = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { text } = req.body;
+      console.log(text)
+
+      if (!text) {
+        throw new ValidationError('text is required');
+      }
+
+      // const job = await this.jobService.createJob({
+      //   type: 'indexing',
+      //   data: { text },
+      // });
+
+      // res.status(201).json({
+      //   status: 'success',
+      //   data: {
+      //     jobId: job.jobId,
+      //     status: job.status,
+      //   },
+      // });
+      res.status(201).json({
+        status: 'success',
+        data: {
+          jobId: 1,
+          status: 'success',
+          message: text
+        },
+      });
+    } catch (error) {
+      console.log(error)
       next(error);
     }
   };

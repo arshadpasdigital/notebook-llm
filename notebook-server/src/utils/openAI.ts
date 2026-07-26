@@ -1,6 +1,7 @@
 import { Document } from "@langchain/core/documents";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { QdrantVectorStore } from "@langchain/qdrant";
+import { v4 as uuid } from "uuid";
 
 
 export const embeddings = new OpenAIEmbeddings({
@@ -94,32 +95,33 @@ export const embeddingAndSimilarSearch = async (query: string) => {
 }
 
 export const embeddingAndIndexingWebsite = async (chunks: any, url: string) => {
-    const vectorStore = await getVectorStore();
+    try {
+        const vectorStore = await getVectorStore();
 
-    chunks.forEach((doc: any, i: number) => {
-        doc.metadata = {
-            ...doc,
-            chunksIndex: i,
-            website: url,
-            source: "website"
-        }
-    });
+        chunks.forEach((doc: any, i: number) => {
+            doc.metadata = {
+                ...doc,
+                chunksIndex: i,
+                website: url,
+                source: "website"
+            }
+        });
 
-    await vectorStore.addDocuments(chunks);
+        await vectorStore.addDocuments(chunks);
+    } catch (error) {
+        console.log("=== get error in embedding and indexing website ===")
+        console.error(error);
+        throw error;
+    }
 }
 
 
-export const embeddingAndIndexText = async (chunks: any) => {
+export const embeddingAndIndexText = async (chunks: string[]) => {
     const vectorStore = await getVectorStore();
 
-    chunks.forEach((doc: any, i: number) => {
-        doc.metadata = {
-            ...doc,
-            chunksIndex: i,
-            source: "text"
-        }
-    });
+    const doc = chunks.map((chunk: string) => (
+        new Document({ pageContent: chunk, id: uuid() })))
 
-    await vectorStore.addDocuments(chunks);
+    await vectorStore.addDocuments(doc);
 }
 

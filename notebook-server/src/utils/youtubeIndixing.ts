@@ -4,15 +4,6 @@ import { embeddingAndIndexingYoutube } from "./openAI";
 import { Innertube } from 'youtubei.js';
 
 
-type CaptionTrack = {
-    baseUrl: string;
-    languageCode?: string;
-    name?: {
-        simpleText?: string;
-        runs?: Array<{ text?: string }>;
-    };
-};
-
 const extractVideoId = (url: string) => {
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=|shorts\/))([a-zA-Z0-9_-]{11})(?:[?&#]|$)/);
     if (!match?.[1]) {
@@ -32,7 +23,7 @@ const getYoutubeTranscriptDirect = async (videoId: string) => {
     if (!track) throw new Error('No caption track found.');
 
     const res = await fetch(track.base_url + '&fmt=json3');
-    const data = await res.json();
+    const data: any = await res.json();
 
     const fullText = data.events
         ?.filter((e: any) => e.segs)

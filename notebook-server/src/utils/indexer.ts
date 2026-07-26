@@ -1,7 +1,7 @@
 import { initCollection } from "./qdrant"
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { embeddingAndIndexing } from "./openAI";
+import { embeddingAndIndexing, embeddingAndIndexText } from "./openAI";
 
 async function extractTextFromPDF(filePath: string) {
     // 1. Initialize the PDF loader with the file path
@@ -22,7 +22,7 @@ async function extractTextFromPDF(filePath: string) {
     };
 }
 
-const getTextChunks = async (docs: any) => {
+const getDocumentChunks = async (docs: any) => {
     const textSplitter = new RecursiveCharacterTextSplitter({
         chunkSize: 1000,
         chunkOverlap: 200,
@@ -31,18 +31,28 @@ const getTextChunks = async (docs: any) => {
     return allSplits;
 }
 
-export const indexOf = async ({ fileName, filePath }: { fileName: string, filePath: string }) => {
+const getTextChunks = async (text: any) => {
+    const textSplitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,
+        chunkOverlap: 200,
+    })
+    const allSplits = await textSplitter.splitText(text);
+    return allSplits;
+}
+
+export const pdfIndexOf = async ({ fileName, filePath }: { fileName: string, filePath: string }) => {
     try {
         await initCollection();
         const pdfData = await extractTextFromPDF(filePath);
-        const chunks = await getTextChunks(pdfData.docs)
+        const chunks = await getDocumentChunks(pdfData.docs)
         await embeddingAndIndexing(chunks, fileName, "This is the course")
         return pdfData;
     } catch (error) {
-
+        console.error("get error in pdfIndexOf")
+        console.error(error)
+        throw error;
     }
 }
-
 
 
 

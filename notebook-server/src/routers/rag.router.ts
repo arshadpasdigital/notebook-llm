@@ -30,11 +30,12 @@ const upload = multer({ storage })
 export function createRAGRouter(jobService: IJobService): Router {
   const router = Router();
   const controller = new RAGController(jobService);
-
+  router.post('/indexing', controller.createIndexingJob);
   router.post('/pdf-indexing', upload.single("mypdf"), controller.createIndexingJob);
   router.post('/vvt-indexing', controller.createIndexingJob);
-  router.post('/youtube-indexing', controller.createIndexingJobForYoutube);
-  router.post('/text-indexing', controller.createIndexingJob);
+  router.post('/youtube-indexing', controller.createIndexingJobForYoutube); //✅ done
+  router.post('/text-indexing', controller.createIndexingJobForText);
+  router.post('/website-indexing', controller.createIndexingJobForWebsite); // ✅ done
   router.get('/:jobId', controller.getJobStatus);
   router.post('/query', controller.createQueryJob);
 

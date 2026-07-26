@@ -1,19 +1,30 @@
 import { Worker } from 'bullmq';
 import { connection } from '../db/jobConnection'
-import { indexOf } from './indexer';
+import { pdfIndexOf } from './indexer';
 import { answerQuery } from './answerQuery';
 import { youtubeVideoIndexOf } from './youtubeIndixing';
 import { websiteUrlIndexOf } from './websiteIndexing';
 import { textIndexOf } from './textIndexing';
 
-const indexingWorker = new Worker("indexing", async (job) => {
+const indexingPdfWorker = new Worker("indexing-pdf", async (job) => {
     console.log(`📥 Indexing job ${job.id}: ${job.data.originalName}`);
 
-    const result = await indexOf({
+    const result = await pdfIndexOf({
         filePath: job.data.filePath,
         fileName: job.data.fileName,
     })
     console.log(`   → ${result?.pagesCount} chunk(s) indexed`);
+    return result;
+
+}, {
+    connection, concurrency: 2
+})
+
+const indexingWorker = new Worker("indexing", async (job) => {
+    console.log(`📥 Indexing job ${job.id}: ${job.data.originalName}`);
+
+    const result = await textIndexOf(job.data.text)
+    console.log(`   → ${result?.length} chunk(s) indexed`);
     return result;
 
 }, {
@@ -66,6 +77,8 @@ const queryWorker = new Worker('query', async (job) => {
 for (const [name, worker] of [
     ["indexing", indexingWorker],
     ["indexing-youtube", indexingYoutubeVideo],
+    ["indexing-website", indexingWebsiteUrl],
+    ["indexingPdfWorker", indexingPdfWorker],
     ["query", queryWorker]
 ]) {
     worker.on("completed", (job) => console.log(`✅ [${name}] job ${job.id} completed`));
