@@ -11,6 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
+import { Route as CollectionsCollectionIdRouteImport } from './routes/collections.$collectionId'
+import { Route as CollectionsCollectionIdIndexRouteImport } from './routes/collections.$collectionId.index'
+import { Route as CollectionsCollectionIdChatRouteImport } from './routes/collections.$collectionId.chat'
+import { Route as CollectionsCollectionIdLearningRouteImport } from './routes/collections.$collectionId.learning'
+import { Route as CollectionsCollectionIdMemoryRouteImport } from './routes/collections.$collectionId.memory'
+import { Route as CollectionsCollectionIdResourcesRouteImport } from './routes/collections.$collectionId.resources'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +30,132 @@ const ChatRoute = ChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsCollectionIdRoute = CollectionsCollectionIdRouteImport.update({
+  id: '/collections/$collectionId',
+  path: '/collections/$collectionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsCollectionIdIndexRoute =
+  CollectionsCollectionIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CollectionsCollectionIdRoute,
+  } as any)
+const CollectionsCollectionIdChatRoute =
+  CollectionsCollectionIdChatRouteImport.update({
+    id: '/chat',
+    path: '/chat',
+    getParentRoute: () => CollectionsCollectionIdRoute,
+  } as any)
+const CollectionsCollectionIdLearningRoute =
+  CollectionsCollectionIdLearningRouteImport.update({
+    id: '/learning',
+    path: '/learning',
+    getParentRoute: () => CollectionsCollectionIdRoute,
+  } as any)
+const CollectionsCollectionIdMemoryRoute =
+  CollectionsCollectionIdMemoryRouteImport.update({
+    id: '/memory',
+    path: '/memory',
+    getParentRoute: () => CollectionsCollectionIdRoute,
+  } as any)
+const CollectionsCollectionIdResourcesRoute =
+  CollectionsCollectionIdResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
+    getParentRoute: () => CollectionsCollectionIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
+  '/login': typeof LoginRoute
+  '/collections/$collectionId': typeof CollectionsCollectionIdRouteWithChildren
+  '/collections/': typeof CollectionsIndexRoute
+  '/collections/$collectionId/chat': typeof CollectionsCollectionIdChatRoute
+  '/collections/$collectionId/learning': typeof CollectionsCollectionIdLearningRoute
+  '/collections/$collectionId/memory': typeof CollectionsCollectionIdMemoryRoute
+  '/collections/$collectionId/resources': typeof CollectionsCollectionIdResourcesRoute
+  '/collections/$collectionId/': typeof CollectionsCollectionIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
+  '/login': typeof LoginRoute
+  '/collections': typeof CollectionsIndexRoute
+  '/collections/$collectionId/chat': typeof CollectionsCollectionIdChatRoute
+  '/collections/$collectionId/learning': typeof CollectionsCollectionIdLearningRoute
+  '/collections/$collectionId/memory': typeof CollectionsCollectionIdMemoryRoute
+  '/collections/$collectionId/resources': typeof CollectionsCollectionIdResourcesRoute
+  '/collections/$collectionId': typeof CollectionsCollectionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
+  '/login': typeof LoginRoute
+  '/collections/$collectionId': typeof CollectionsCollectionIdRouteWithChildren
+  '/collections/': typeof CollectionsIndexRoute
+  '/collections/$collectionId/chat': typeof CollectionsCollectionIdChatRoute
+  '/collections/$collectionId/learning': typeof CollectionsCollectionIdLearningRoute
+  '/collections/$collectionId/memory': typeof CollectionsCollectionIdMemoryRoute
+  '/collections/$collectionId/resources': typeof CollectionsCollectionIdResourcesRoute
+  '/collections/$collectionId/': typeof CollectionsCollectionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat'
+  fullPaths:
+    | '/'
+    | '/chat'
+    | '/login'
+    | '/collections/$collectionId'
+    | '/collections/'
+    | '/collections/$collectionId/chat'
+    | '/collections/$collectionId/learning'
+    | '/collections/$collectionId/memory'
+    | '/collections/$collectionId/resources'
+    | '/collections/$collectionId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat'
-  id: '__root__' | '/' | '/chat'
+  to:
+    | '/'
+    | '/chat'
+    | '/login'
+    | '/collections'
+    | '/collections/$collectionId/chat'
+    | '/collections/$collectionId/learning'
+    | '/collections/$collectionId/memory'
+    | '/collections/$collectionId/resources'
+    | '/collections/$collectionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/chat'
+    | '/login'
+    | '/collections/$collectionId'
+    | '/collections/'
+    | '/collections/$collectionId/chat'
+    | '/collections/$collectionId/learning'
+    | '/collections/$collectionId/memory'
+    | '/collections/$collectionId/resources'
+    | '/collections/$collectionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChatRoute: typeof ChatRoute
+  LoginRoute: typeof LoginRoute
+  CollectionsCollectionIdRoute: typeof CollectionsCollectionIdRouteWithChildren
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +174,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections/'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$collectionId': {
+      id: '/collections/$collectionId'
+      path: '/collections/$collectionId'
+      fullPath: '/collections/$collectionId'
+      preLoaderRoute: typeof CollectionsCollectionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$collectionId/': {
+      id: '/collections/$collectionId/'
+      path: '/'
+      fullPath: '/collections/$collectionId/'
+      preLoaderRoute: typeof CollectionsCollectionIdIndexRouteImport
+      parentRoute: typeof CollectionsCollectionIdRoute
+    }
+    '/collections/$collectionId/chat': {
+      id: '/collections/$collectionId/chat'
+      path: '/chat'
+      fullPath: '/collections/$collectionId/chat'
+      preLoaderRoute: typeof CollectionsCollectionIdChatRouteImport
+      parentRoute: typeof CollectionsCollectionIdRoute
+    }
+    '/collections/$collectionId/learning': {
+      id: '/collections/$collectionId/learning'
+      path: '/learning'
+      fullPath: '/collections/$collectionId/learning'
+      preLoaderRoute: typeof CollectionsCollectionIdLearningRouteImport
+      parentRoute: typeof CollectionsCollectionIdRoute
+    }
+    '/collections/$collectionId/memory': {
+      id: '/collections/$collectionId/memory'
+      path: '/memory'
+      fullPath: '/collections/$collectionId/memory'
+      preLoaderRoute: typeof CollectionsCollectionIdMemoryRouteImport
+      parentRoute: typeof CollectionsCollectionIdRoute
+    }
+    '/collections/$collectionId/resources': {
+      id: '/collections/$collectionId/resources'
+      path: '/resources'
+      fullPath: '/collections/$collectionId/resources'
+      preLoaderRoute: typeof CollectionsCollectionIdResourcesRouteImport
+      parentRoute: typeof CollectionsCollectionIdRoute
+    }
   }
 }
+
+interface CollectionsCollectionIdRouteChildren {
+  CollectionsCollectionIdChatRoute: typeof CollectionsCollectionIdChatRoute
+  CollectionsCollectionIdLearningRoute: typeof CollectionsCollectionIdLearningRoute
+  CollectionsCollectionIdMemoryRoute: typeof CollectionsCollectionIdMemoryRoute
+  CollectionsCollectionIdResourcesRoute: typeof CollectionsCollectionIdResourcesRoute
+  CollectionsCollectionIdIndexRoute: typeof CollectionsCollectionIdIndexRoute
+}
+
+const CollectionsCollectionIdRouteChildren: CollectionsCollectionIdRouteChildren =
+  {
+    CollectionsCollectionIdChatRoute: CollectionsCollectionIdChatRoute,
+    CollectionsCollectionIdLearningRoute: CollectionsCollectionIdLearningRoute,
+    CollectionsCollectionIdMemoryRoute: CollectionsCollectionIdMemoryRoute,
+    CollectionsCollectionIdResourcesRoute:
+      CollectionsCollectionIdResourcesRoute,
+    CollectionsCollectionIdIndexRoute: CollectionsCollectionIdIndexRoute,
+  }
+
+const CollectionsCollectionIdRouteWithChildren =
+  CollectionsCollectionIdRoute._addFileChildren(
+    CollectionsCollectionIdRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatRoute: ChatRoute,
+  LoginRoute: LoginRoute,
+  CollectionsCollectionIdRoute: CollectionsCollectionIdRouteWithChildren,
+  CollectionsIndexRoute: CollectionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

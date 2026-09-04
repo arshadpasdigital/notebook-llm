@@ -1,20 +1,15 @@
-import { AppSidebar } from '@/components/app-sidebar'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import ChatPage from '@/features/chat'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from "@tanstack/react-router"
 
-export const Route = createFileRoute('/chat')({
-  component: RouteComponent,
+export const Route = createFileRoute("/chat")({
+  component: ChatCompatibilityRoute,
 })
 
-function RouteComponent() {
+function ChatCompatibilityRoute() {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        <ChatPage/>
-      </main>
-    </SidebarProvider>
+    <Navigate
+      to="/collections/$collectionId/chat"
+      params={{ collectionId: "demo" }}
+      replace
+    />
   )
 }

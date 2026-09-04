@@ -1,50 +1,120 @@
-// @Goal: it is side bar of my Project where in header there is a add source button and when we click the button then a model is popup and in sidebar Content we show the list of which we delete it. 
-
-import { useState } from "react"
+import { useState, type ComponentType } from "react"
+import { FileText, Globe2, Link2, Trash2, Type } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import type { Source, SourceDraft, SourceType } from "@/features/chat/types"
 import { SourceModal } from "./source-modal"
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  sources: Source[]
+  onSourceAdded: (sources: SourceDraft[]) => void
+  onRemoveSource: (sourceId: string) => void
+}
+
+const sourceLabels: Record<SourceType, string> = {
+  pdf: "PDF",
+  youtube: "YouTube",
+  text: "Text",
+  website: "Website",
+}
+
+const sourceIcons: Record<SourceType, ComponentType<{ className?: string }>> = {
+  pdf: FileText,
+  youtube: Link2,
+  text: Type,
+  website: Globe2,
+}
+
+export function AppSidebar({
+  sources,
+  onSourceAdded,
+  onRemoveSource,
+}: AppSidebarProps) {
   const [sourceModalOpen, setSourceModalOpen] = useState(false)
 
   return (
     <>
       <Sidebar>
         <SidebarHeader className="border-b">
-          <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex items-center justify-between gap-3 px-4 py-2">
             <h2 className="text-lg font-semibold">Sources</h2>
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               size="sm"
               onClick={() => setSourceModalOpen(true)}
             >
-              + Add Source
+              Add source
             </Button>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Added Sources</SidebarGroupLabel>
-            {/* Source items will be rendered here */}
-          </SidebarGroup>
-          <SidebarGroup>
-            <SidebarGroupLabel>Recent</SidebarGroupLabel>
-            {/* Recent sources will be rendered here */}
+            <SidebarGroupLabel>
+              {sources.length === 0
+                ? "No sources yet"
+                : `${sources.length} source${sources.length === 1 ? "" : "s"}`}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              {sources.length === 0 ? (
+                <p className="px-2 text-sm leading-relaxed text-muted-foreground">
+                  Add a PDF, video, website, or text to start a notebook.
+                </p>
+              ) : (
+                <SidebarMenu>
+                  {sources.map((source) => {
+                    const SourceIcon = sourceIcons[source.type]
+
+                    return (
+                      <SidebarMenuItem key={source.id}>
+                        <div className="flex items-center gap-1">
+                          <SidebarMenuButton
+                            className="min-w-0 flex-1"
+                            title={source.name}
+                          >
+                            <SourceIcon className="size-4" />
+                            <span className="min-w-0 flex-1 truncate">
+                              {source.name}
+                            </span>
+                            <span className="sr-only">
+                              {sourceLabels[source.type]} source,{" "}
+                              {source.status}
+                            </span>
+                          </SidebarMenuButton>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            aria-label={`Remove ${source.name}`}
+                            title={`Remove ${source.name}`}
+                            onClick={() => onRemoveSource(source.id)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              )}
+            </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-      <SourceModal 
-        open={sourceModalOpen} 
-        setOpen={setSourceModalOpen} 
+      <SourceModal
+        open={sourceModalOpen}
+        setOpen={setSourceModalOpen}
+        onSourceAdded={onSourceAdded}
       />
     </>
   )
